@@ -86,3 +86,5 @@ public ThreadPoolExecutor(int corePoolSize,
 ::: important
 // TODO 补充线程池提交任务流程
 :::
+
+我们来看一下 Executors 工厂类中默认的几个快捷线程池代码。
