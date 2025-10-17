@@ -1,2 +1,10 @@
-# gold_blog
-daily blog repository
+# 记录日常学习的博客内容
+
+## Java基础
+
+## 并发编程
+
+## 数据库
+
+## 设计模式
+
