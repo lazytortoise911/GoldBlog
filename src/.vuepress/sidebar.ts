@@ -54,7 +54,19 @@ export default sidebar({
                 "Performance09.md",
                 "Performance10.md",
                 "Performance11.md",
-                "Performance12.md"
+                "Performance12.md",
+                "Performance13.md"
+            ]
+        }
+    ],
+    "/md/java/": [
+        {
+            text: "Java并发",
+            icon: "chart-simple",
+            prefix: "/md/java/concurrent/",
+            children: [
+                "ThreadLocal.md",
+                "Collection.md"
             ]
         }
     ]

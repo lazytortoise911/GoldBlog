@@ -22,5 +22,10 @@ export default navbar([
         text: "性能优化",
         icon: "chart-simple",
         link: "/md/performance/"
+    },
+    {
+        text: "Java",
+        icon: "chart-simple",
+        children: ["/md/java/concurrent/README.md"]
     }
 ]);

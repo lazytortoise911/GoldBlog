@@ -7,8 +7,8 @@ bgImage: https://theme-hope-assets.vuejs.press/bg/6-light.svg
 bgImageDark: https://theme-hope-assets.vuejs.press/bg/6-dark.svg
 bgImageStyle:
   background-attachment: fixed
-heroText: 我的博客
-tagline: 您好，我叫lzq，在这里记录我的日常学习博客
+heroText: gold blog
+tagline: 日常博客记录
 actions:
   - text: 查看博客 👣
     link: ./md/
