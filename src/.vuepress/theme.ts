@@ -3,6 +3,9 @@ import navbar from "./navbar.js";
 import sidebar from "./sidebar.js";
 
 export default hopeTheme({
+
+    lastUpdated: true,
+
     hostname: "https://mister-hope.github.io",
 
     author: {
