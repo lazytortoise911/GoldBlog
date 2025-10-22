@@ -56,7 +56,10 @@ export default sidebar({
                 "Performance11.md",
                 "Performance12.md",
                 "Performance13.md",
-                "Performance14.md"
+                "Performance14.md",
+                "Performance15.md",
+                "Performance16.md",
+                "Performance17.md"
             ]
         }
     ],

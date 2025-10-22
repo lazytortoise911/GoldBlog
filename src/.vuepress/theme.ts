@@ -4,7 +4,7 @@ import sidebar from "./sidebar.js";
 
 export default hopeTheme({
 
-    lastUpdated: true,
+    lastUpdated: false,
 
     hostname: "https://mister-hope.github.io",
 
@@ -131,6 +131,7 @@ export default hopeTheme({
 
     // These features are enabled for demo, only preserve features you need here
     markdown: {
+        breaks: false,
         align: true,
         attrs: true,
         codeTabs: true,

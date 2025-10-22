@@ -16,8 +16,9 @@ synchronized的方式加锁，会让线程在 BLOCKED 状态和 RUNNABLE 状态�
 
 CAS是Compare And Swap的缩写，意思是**比较并替换**。
 
-CAS 机制当中使用了 3 个基本操作数：内存地址V、期望值E、要修改的新值N。更新一个变量的时候，只有当变量的预期值E 和内存地址V
-的真正值相同时，才会将内存地址V 对应的值修改为 N。
+CAS 机制当中使用了 3 个基本操作数：内存地址V、期望值E、要修改的新值N。更新一个变量的时候，只有当变量的预期值E 和内存地址V的真正值相同时，
+才会将内存地址V 对应的值修改为 N。
+
 ![cas.png](../../../src/.vuepress/public/assets/third/cas.png)
 
 如果本次修改不成功，怎么办？很多情况下，它将一直重试，直到修改为期望的值。
@@ -50,7 +51,7 @@ public final int getAndAddInt(Object o, long offset, int delta) {
 os_cpu/linux_x86/atomic_linux_x86.hpp。可以看到，最底层的调用，是汇编语言，而最重要的，就是cmpxchgl指令。到这里没法再往下找代码了，因为
 **CAS 的原子性实际上是硬件 CPU 直接保证的**。
 
-```text
+```cpp
 template<>
 template<typename T>
 inline T Atomic::PlatformCmpxchg<4>::operator()(T exchange_value,
@@ -120,7 +121,7 @@ CAS，即乐观锁的缺点：
 
 对于数据库来说，就可以通过加行锁进行解决，拿 MySQL 来说，MyISAM 是不支持行锁的，我们只能使用 InnoDB，典型的 SQL 语句如下：
 
-```mysql
+```sql
 select *
 from user
 where userid = {id} for
@@ -144,23 +145,19 @@ update
 ```sql
 #
 old_balance获取
-select balance
-from user
-where userid ={id}
-    # 更新动作
-update user
-set balance = balance - 20
-where userid ={id}
-  and balance >= 20
-  and balance = $old_balance
+select balancefrom userwhere userid ={id}
+# 更新动作
+update user set balance = balance - 20
+            where userid ={id}
+            and balance >= 20
+            and balance = $old_balance
 ```
 
 还有一种 CAS 的变种，就是使用版本号机制。通过在表中加一个额外的字段
 version，来代替对余额的判断。这种方式不用去关注具体的业务逻辑，可控制多个变量的更新，可扩展性更强，典型的伪代码如下：
 
 ```sql
-version
-,balance = dao.getBalance(userid)
+version,balance = dao.getBalance(userid)
 balance = balance - cost
 dao.exec("
     update user 
@@ -197,7 +194,6 @@ public void lock(String key, int timeOutSecond) {
         }
     }
 }
-
 public void unlock(String key) {
     redisTemplate.delete(key);
 }
@@ -214,7 +210,7 @@ public void unlock(String key) {
 
 此时，请求 B 和请求 C 都成功地获取了锁 x，我们的分布式锁失效了，在执行业务逻辑的时候，就容易发生问题。
 
-所以，在删除锁的时候，需要判断它的请求方是否正确。首先，获取锁中的当前标识，然后，在删除的时候，判断这个标识是否和解锁请求中的相同。
+所以，**在删除锁的时候，需要判断它的请求方是否正确**。首先，获取锁中的当前标识，然后，在删除的时候，判断这个标识是否和解锁请求中的相同。
 
 可以看到，读取和判断是两个不同的操作，在这两个操作之间同样会有间隙，高并发下会出现执行错乱问题，而稳妥的方案，是使用 lua
 脚本把它们封装成原子操作。
@@ -260,27 +256,16 @@ redisson 会通过看门狗机制对锁进行无限续期，来保证业务的�
 ```java
 String resourceKey = "goodgirl";
 RLock lock = redisson.getLock(resourceKey);
-try{
-        lock.
-
-lock(5,TimeUnit.SECONDS);
+try {
+    lock.lock(5, TimeUnit.SECONDS);
 //真正的业务
-    Thread.
-
-sleep(100);
-}catch(
-Exception ex){
-        ex.
-
-printStackTrace();
-}finally{
-        if(lock.
-
-isLocked()){
-        lock.
-
-unlock();
-    }
+    Thread.sleep(100);
+} catch (Exception ex) {
+    ex.printStackTrace();
+} finally {
+      if (lock.isLocked()) {
+      lock.unlock();
+}
             }
 ```
 
@@ -313,23 +298,25 @@ I/O 上，而不是慢在队列上。
 
 **悲观锁**每次操作数据的时候，都会认为别人会修改，所以每次在操作数据的时候，都会加锁，除非别人释放掉锁。
 
-乐观锁在读多写少的情况下，之所以比悲观锁快，是因为悲观锁需要进行很多额外的操作，并且乐观锁在没有冲突的情况下，也根本不耗费资源。但乐观锁在冲突比较严重的情况下，由于不断地重试，其性能在大多数情况下，是不如悲观锁的。
+乐观锁在读多写少的情况下，之所以比悲观锁快，是因为悲观锁需要进行很多额外的操作，并且乐观锁在没有冲突的情况下，也根本不耗费资源。但乐观锁在冲突比较严
+重的情况下，由于不断地重试，其性能在大多数情况下，是不如悲观锁的。
 
 由于乐观锁的这个特性，乐观锁在读多写少的互联网环境中被广泛应用。
 
-本课时，我们主要看了在数据库层面的一个乐观锁实现，以及Redis 分布式锁的实现，后者在实现的时候，还是有很多细节需要注意的，建议使用
-redisson 的 RLock。
+本课时，我们主要看了在数据库层面的一个乐观锁实现，以及Redis 分布式锁的实现，后者在实现的时候，还是有很多细节需要注意的，建议使用redisson 的 RLock。
 
-当然，乐观锁有它的使用场景。当冲突非常严重的情况下，会进行大量的无效计算；它也只能保护单一的资源，处理多个资源的情况下就捉襟见肘；它还会有
-ABA 问题，使用带版本号的乐观锁变种可以解决这个问题。
+当然，乐观锁有它的使用场景。当冲突非常严重的情况下，会进行大量的无效计算；它也只能保护单一的资源，处理多个资源的情况下就捉襟见肘；它还会有 ABA 问题，
+使用带版本号的乐观锁变种可以解决这个问题。
 
 这些经验，我们都可以从 CAS 中进行借鉴。多线程环境和分布式环境有很多相似之处，对于乐观锁来说，我们找到一种检测冲突的机制，就基本上实现了。
 
 下面留一个问题，请你分析解答：
 
-一个接口的写操作，大约会花费 5 分钟左右的时间。它在开始写时，会把数据库里的一个字段值更新为 start，写入完成后，更新为
-done。有另外一个用户也想写入一些数据，但需要等待状态为 done。
+一个接口的写操作，大约会花费 5 分钟左右的时间。它在开始写时，会把数据库里的一个字段值更新为 start，写入完成后，更新为done。有另外一个用户也想写入
+一些数据，但需要等待状态为 done。
 
 于是，开发人员在 WEB 端，使用轮询，每隔 5 秒，查询字段值是否为 done，当查询到正确的值，即可开始进行数据写入。
 
 开发人员的这个方法，属于乐观锁吗？有哪些潜在问题？应该如何避免？欢迎你在下方留言区作答，我将一一解答，与你讨论。
+
+是轮询等待机制

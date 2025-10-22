@@ -18,7 +18,7 @@ icon: chart-simple
   ** 基础设施
   *** 组件多
   *** 技术难度高
-  @endmindmap
+@endmindmap
 
 处理秒杀业务有三个绝招：
 
