@@ -27,5 +27,10 @@ export default navbar([
         text: "Java",
         icon: "chart-simple",
         children: ["/md/java/concurrent/README.md"]
+    },
+    {
+        text: "Spring",
+        icon: "seedling",
+        children: ["/md/spring/springboot/README.md"]
     }
 ]);

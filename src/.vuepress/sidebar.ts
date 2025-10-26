@@ -73,5 +73,19 @@ export default sidebar({
                 "Collection.md"
             ]
         }
+    ],
+    "/md/spring/": [
+        {
+            text: "SpringBoot",
+            icon: "seedling",
+            prefix: "/md/spring/springboot/",
+            children: [
+                "Boot04.md",
+                "Boot05.md",
+                "Boot06.md",
+                "Boot07.md",
+                "Collection.md"
+            ]
+        }
     ]
 });
